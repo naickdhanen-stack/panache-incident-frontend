@@ -44,12 +44,14 @@ export const AuthProvider = ({ children }) => {
       
       setToken(token);
       setUser(user);
+      setLoading(false);
       
       // Token will be automatically added by axios interceptor in api.js
 
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
+      setLoading(false);
       return {
         success: false,
         error: error.response?.data?.error || 'Login failed'
