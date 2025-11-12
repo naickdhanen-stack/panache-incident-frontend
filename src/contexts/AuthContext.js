@@ -45,8 +45,7 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      // Set default axios header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Token will be automatically added by axios interceptor in api.js
 
       return { success: true };
     } catch (error) {

@@ -50,7 +50,34 @@ export const incidentsAPI = {
   }),
   acknowledge: (id, data) => axios.post(`/incidents/${id}/acknowledge`, data),
   updateStatus: (id, status) => axios.patch(`/incidents/${id}/status`, { status }),
-  delete: (id) => axios.delete(`/incidents/${id}`)
+  delete: (id) => axios.delete(`/incidents/${id}`),
+  validateFiles: (files) => {
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = ['image/', 'video/'];
+    
+    if (!files || files.length === 0) {
+      return { valid: true };
+    }
+    
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        return {
+          valid: false,
+          error: `File "${file.name}" exceeds 10MB limit`
+        };
+      }
+      
+      const isAllowedType = ALLOWED_TYPES.some(type => file.type.startsWith(type));
+      if (!isAllowedType) {
+        return {
+          valid: false,
+          error: `File "${file.name}" is not an image or video`
+        };
+      }
+    }
+    
+    return { valid: true };
+  }
 };
 
 export default axios;
