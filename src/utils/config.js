@@ -1,5 +1,6 @@
 // src/config.js
-export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Ensure the API base includes the /api prefix so frontend usersAPI('/users') maps to backend '/api/users'
+export const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/api';
 
 export const SOURCES_OF_INCIDENT = [
   'Customer Complaint',
