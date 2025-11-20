@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { incidentsAPI } from '../utils/api';
-import { SOURCES_OF_INCIDENT, MISTAKES_COMMITTED } from '../utils/config';
+import { SOURCES_OF_INCIDENT } from '../utils/config';
 import './UserDashboard.css';
 
 const UserDashboard = () => {
@@ -17,11 +17,11 @@ const UserDashboard = () => {
     date_of_incident: '',
     project_name: '',
     source_of_incident: '',
-    mistake_committed: '',
     preliminary_investigation: false,
     details_and_findings: '',
     suggestions: ''
   });
+
   const [attachments, setAttachments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -64,12 +64,10 @@ const UserDashboard = () => {
     try {
       const data = new FormData();
       
-      // Append form fields
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
 
-      // Append files
       attachments.forEach(file => {
         data.append('attachments', file);
       });
@@ -78,24 +76,19 @@ const UserDashboard = () => {
 
       setMessage({ type: 'success', text: 'Incident reported successfully!' });
       
-      // Reset form
       setFormData({
         subject: '',
         date_of_incident: '',
         project_name: '',
         source_of_incident: '',
-        mistake_committed: '',
         preliminary_investigation: false,
         details_and_findings: '',
         suggestions: ''
       });
       setAttachments([]);
-      
-      // Reset file input
       const fileInput = document.getElementById('attachments');
       if (fileInput) fileInput.value = '';
 
-      // Refresh incidents if viewing
       if (showComplaints) {
         fetchIncidents();
       }
@@ -206,21 +199,6 @@ const UserDashboard = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label>Mistake Committed by Employee *</label>
-                  <select
-                    name="mistake_committed"
-                    value={formData.mistake_committed}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select mistake type</option>
-                    {MISTAKES_COMMITTED.map(mistake => (
-                      <option key={mistake} value={mistake}>{mistake}</option>
-                    ))}
-                  </select>
-                </div>
-
                 <div className="form-group checkbox-group">
                   <label>
                     <input
@@ -235,14 +213,14 @@ const UserDashboard = () => {
               </div>
 
               <div className="form-group">
-                <label>Details and Findings *</label>
+                <label>Details of Mistake Committed and Findings *</label>
                 <textarea
                   name="details_and_findings"
                   value={formData.details_and_findings}
                   onChange={handleInputChange}
                   rows="5"
                   required
-                  placeholder="Describe the incident in detail..."
+                  placeholder="Explain the mistake committed and your findings..."
                 />
               </div>
 
@@ -311,13 +289,10 @@ const UserDashboard = () => {
                           <strong>Source of Incident:</strong> {incident.source_of_incident}
                         </div>
                         <div className="detail-row">
-                          <strong>Mistake Committed:</strong> {incident.mistake_committed}
-                        </div>
-                        <div className="detail-row">
                           <strong>Preliminary Investigation:</strong> {incident.preliminary_investigation ? 'Yes' : 'No'}
                         </div>
                         <div className="detail-row">
-                          <strong>Details and Findings:</strong>
+                          <strong>Details of Mistake Committed and Findings:</strong>
                           <p>{incident.details_and_findings}</p>
                         </div>
                         {incident.suggestions && (
@@ -327,7 +302,6 @@ const UserDashboard = () => {
                           </div>
                         )}
 
-                        {/* Show responses if any */}
                         {incident.incident_responses && incident.incident_responses.length > 0 && (
                           <div className="response-section">
                             <h4>HR Response</h4>
