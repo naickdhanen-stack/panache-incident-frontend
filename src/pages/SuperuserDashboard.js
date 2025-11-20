@@ -12,6 +12,7 @@ const SuperuserDashboard = () => {
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [acknowledgingIncident, setAcknowledgingIncident] = useState(null);
 
+  // Create user form state
   const [newUser, setNewUser] = useState({
     username: '',
     password: '',
@@ -20,6 +21,7 @@ const SuperuserDashboard = () => {
   });
   const [userMessage, setUserMessage] = useState({ type: '', text: '' });
 
+  // Acknowledge form state
   const [acknowledgeData, setAcknowledgeData] = useState({
     investigation_findings: '',
     root_cause: '',
@@ -43,8 +45,8 @@ const SuperuserDashboard = () => {
     setLoading(false);
   };
 
-  const toggleIncidentDetails = (id) => {
-    setExpandedIncident(expandedIncident === id ? null : id);
+  const toggleIncidentDetails = (incidentId) => {
+    setExpandedIncident(expandedIncident === incidentId ? null : incidentId);
   };
 
   const handleCreateUser = async (e) => {
@@ -54,18 +56,24 @@ const SuperuserDashboard = () => {
     try {
       await usersAPI.create(newUser);
       setUserMessage({ type: 'success', text: 'User created successfully!' });
-      setNewUser({ username: '', password: '', role: 'user', department: '' });
+      setNewUser({
+        username: '',
+        password: '',
+        role: 'user',
+        department: ''
+      });
     } catch (error) {
       console.error('Error creating user:', error);
       setUserMessage({
         type: 'error',
-        text: error.response?.data?.error || 'Failed to create user',
+        text: error.response?.data?.error || 'Failed to create user'
       });
     }
   };
 
   const handleUserInputChange = (e) => {
-    setNewUser({ ...newUser, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewUser({ ...newUser, [name]: value });
   };
 
   const openAcknowledgeForm = (incident) => {
@@ -91,7 +99,8 @@ const SuperuserDashboard = () => {
   };
 
   const handleAcknowledgeInputChange = (e) => {
-    setAcknowledgeData({ ...acknowledgeData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setAcknowledgeData({ ...acknowledgeData, [name]: value });
   };
 
   const handleAcknowledgeSubmit = async (e) => {
@@ -103,7 +112,7 @@ const SuperuserDashboard = () => {
       closeAcknowledgeForm();
       fetchIncidents();
     } catch (error) {
-      console.error('Error acknowledging:', error);
+      console.error('Error acknowledging incident:', error);
       alert('Failed to acknowledge incident');
     }
   };
@@ -119,13 +128,17 @@ const SuperuserDashboard = () => {
 
   return (
     <div className="dashboard-container">
+      {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
           <h1>PANACHE - HR Dashboard</h1>
           <p className="user-info">Welcome, {user.username} | {user.department}</p>
         </div>
         <div className="header-right">
-          <button className="create-user-btn" onClick={() => setShowCreateUser(!showCreateUser)}>
+          <button 
+            className="create-user-btn"
+            onClick={() => setShowCreateUser(!showCreateUser)}
+          >
             {showCreateUser ? 'View Incidents' : 'Create User'}
           </button>
           <button className="logout-btn" onClick={logout}>Logout</button>
@@ -134,6 +147,7 @@ const SuperuserDashboard = () => {
 
       <div className="dashboard-content">
         {showCreateUser ? (
+          /* Create User Form */
           <div className="create-user-container">
             <h2>Create New User</h2>
 
@@ -146,17 +160,35 @@ const SuperuserDashboard = () => {
             <form onSubmit={handleCreateUser} className="create-user-form">
               <div className="form-group">
                 <label>Username *</label>
-                <input type="text" name="username" value={newUser.username} onChange={handleUserInputChange} required />
+                <input
+                  type="text"
+                  name="username"
+                  value={newUser.username}
+                  onChange={handleUserInputChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label>Password *</label>
-                <input type="password" name="password" value={newUser.password} onChange={handleUserInputChange} required minLength="6" />
+                <input
+                  type="password"
+                  name="password"
+                  value={newUser.password}
+                  onChange={handleUserInputChange}
+                  required
+                  minLength="6"
+                />
               </div>
 
               <div className="form-group">
                 <label>Role *</label>
-                <select name="role" value={newUser.role} onChange={handleUserInputChange} required>
+                <select
+                  name="role"
+                  value={newUser.role}
+                  onChange={handleUserInputChange}
+                  required
+                >
                   <option value="user">User (Employee)</option>
                   <option value="superuser">Superuser (HR)</option>
                   <option value="admin">Admin</option>
@@ -181,6 +213,7 @@ const SuperuserDashboard = () => {
             </form>
           </div>
         ) : (
+          /* Incidents List */
           <div className="incidents-container">
             <h2>All Incident Reports</h2>
 
@@ -213,24 +246,37 @@ const SuperuserDashboard = () => {
                     {expandedIncident === incident.id && (
                       <div className="incident-details">
                         <div className="details-grid">
-                          
                           <div className="detail-section">
                             <h4>Incident Information</h4>
-                            <div className="detail-row"><strong>Employee ID:</strong> {incident.user?.id}</div>
-                            <div className="detail-row"><strong>Department:</strong> {incident.user?.department}</div>
-                            <div className="detail-row"><strong>Date of Incident:</strong> {new Date(incident.date_of_incident).toLocaleDateString()}</div>
-                            <div className="detail-row"><strong>Project Name:</strong> {incident.project_name || 'N/A'}</div>
-                            <div className="detail-row"><strong>Source of Incident:</strong> {incident.source_of_incident}</div>
-                            <div className="detail-row"><strong>Preliminary Investigation Done:</strong> {incident.preliminary_investigation ? 'Yes' : 'No'}</div>
+                            <div className="detail-row">
+                              <strong>Employee ID:</strong> {incident.user?.id}
+                            </div>
+                            <div className="detail-row">
+                              <strong>Department:</strong> {incident.user?.department}
+                            </div>
+                            <div className="detail-row">
+                              <strong>Date of Incident:</strong> {new Date(incident.date_of_incident).toLocaleDateString()}
+                            </div>
+                            <div className="detail-row">
+                              <strong>Project Name:</strong> {incident.project_name || 'N/A'}
+                            </div>
+                            <div className="detail-row">
+                              <strong>Source of Incident:</strong> {incident.source_of_incident}
+                            </div>
+                            <div className="detail-row">
+                              <strong>Mistake Committed:</strong> {incident.mistake_committed}
+                            </div>
+                            <div className="detail-row">
+                              <strong>Preliminary Investigation Done:</strong> {incident.preliminary_investigation ? 'Yes' : 'No'}
+                            </div>
                           </div>
 
                           <div className="detail-section">
                             <h4>Details</h4>
                             <div className="detail-row">
-                              <strong>Details of Mistake Committed and Findings:</strong>
+                              <strong>Details and Findings:</strong>
                               <p>{incident.details_and_findings}</p>
                             </div>
-
                             {incident.suggestions && (
                               <div className="detail-row">
                                 <strong>Employee Suggestions:</strong>
@@ -238,60 +284,58 @@ const SuperuserDashboard = () => {
                               </div>
                             )}
                           </div>
-
                         </div>
 
-                        {incident.incident_responses?.length > 0 && (
+                        {/* Show existing responses */}
+                        {incident.incident_responses && incident.incident_responses.length > 0 && (
                           <div className="responses-section">
                             <h4>Acknowledgment History</h4>
                             {incident.incident_responses.map(response => (
                               <div key={response.id} className="response-card">
-
                                 {response.investigation_findings && (
                                   <div className="detail-row">
                                     <strong>Investigation Findings:</strong>
                                     <p>{response.investigation_findings}</p>
                                   </div>
                                 )}
-
                                 {response.root_cause && (
                                   <div className="detail-row">
                                     <strong>Root Cause:</strong> {response.root_cause}
                                   </div>
                                 )}
-
                                 {response.action_taken && (
                                   <div className="detail-row">
                                     <strong>Action Taken:</strong>
                                     <p>{response.action_taken}</p>
                                   </div>
                                 )}
-
                                 {response.further_action_plan && (
                                   <div className="detail-row">
                                     <strong>Further Action Plan:</strong>
                                     <p>{response.further_action_plan}</p>
                                   </div>
                                 )}
-
                                 <div className="detail-row">
                                   <small>Acknowledged: {new Date(response.acknowledged_at).toLocaleString()}</small>
                                 </div>
-
                               </div>
                             ))}
                           </div>
                         )}
 
+                        {/* Acknowledge Button */}
                         <div className="actions-section">
-                          <button className="acknowledge-btn" onClick={() => openAcknowledgeForm(incident)}>
-                            {incident.incident_responses?.length > 0 ? 'Add Follow-up Response' : 'Acknowledge Incident'}
+                          <button 
+                            className="acknowledge-btn"
+                            onClick={() => openAcknowledgeForm(incident)}
+                          >
+                            {incident.incident_responses && incident.incident_responses.length > 0 
+                              ? 'Add Follow-up Response' 
+                              : 'Acknowledge Incident'}
                           </button>
                         </div>
-
                       </div>
                     )}
-
                   </div>
                 ))}
               </div>
@@ -300,6 +344,7 @@ const SuperuserDashboard = () => {
         )}
       </div>
 
+      {/* Acknowledge Modal */}
       {acknowledgingIncident && (
         <div className="modal-overlay" onClick={closeAcknowledgeForm}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -316,14 +361,22 @@ const SuperuserDashboard = () => {
                   value={acknowledgeData.investigation_findings}
                   onChange={handleAcknowledgeInputChange}
                   rows="4"
+                  placeholder="Describe the investigation findings..."
                 />
               </div>
 
               <div className="form-group">
                 <label>Root Cause *</label>
-                <select name="root_cause" value={acknowledgeData.root_cause} onChange={handleAcknowledgeInputChange} required>
+                <select
+                  name="root_cause"
+                  value={acknowledgeData.root_cause}
+                  onChange={handleAcknowledgeInputChange}
+                  required
+                >
                   <option value="">Select root cause</option>
-                  {ROOT_CAUSES.map(c => (<option key={c} value={c}>{c}</option>))}
+                  {ROOT_CAUSES.map(cause => (
+                    <option key={cause} value={cause}>{cause}</option>
+                  ))}
                 </select>
               </div>
 
@@ -334,6 +387,7 @@ const SuperuserDashboard = () => {
                   value={acknowledgeData.action_taken}
                   onChange={handleAcknowledgeInputChange}
                   rows="3"
+                  placeholder="What action has been taken?"
                 />
               </div>
 
@@ -344,22 +398,34 @@ const SuperuserDashboard = () => {
                   value={acknowledgeData.further_action_plan}
                   onChange={handleAcknowledgeInputChange}
                   rows="3"
+                  placeholder="What further actions are needed?"
                 />
               </div>
 
               <div className="form-group">
                 <label>Status *</label>
                 <div className="status-buttons">
-                  {['open', 'in-progress', 'closed'].map(s => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`status-btn ${acknowledgeData.status === s ? 'active' : ''}`}
-                      onClick={() => setAcknowledgeData({ ...acknowledgeData, status: s })}
-                    >
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </button>
-                  ))}
+                  <button
+                    type="button"
+                    className={`status-btn ${acknowledgeData.status === 'open' ? 'active' : ''}`}
+                    onClick={() => setAcknowledgeData({ ...acknowledgeData, status: 'open' })}
+                  >
+                    Open
+                  </button>
+                  <button
+                    type="button"
+                    className={`status-btn ${acknowledgeData.status === 'in-progress' ? 'active' : ''}`}
+                    onClick={() => setAcknowledgeData({ ...acknowledgeData, status: 'in-progress' })}
+                  >
+                    In Progress
+                  </button>
+                  <button
+                    type="button"
+                    className={`status-btn ${acknowledgeData.status === 'closed' ? 'active' : ''}`}
+                    onClick={() => setAcknowledgeData({ ...acknowledgeData, status: 'closed' })}
+                  >
+                    Closed
+                  </button>
                 </div>
               </div>
 
@@ -371,7 +437,6 @@ const SuperuserDashboard = () => {
                   Submit Acknowledgment
                 </button>
               </div>
-
             </form>
           </div>
         </div>
@@ -381,4 +446,3 @@ const SuperuserDashboard = () => {
 };
 
 export default SuperuserDashboard;
-
