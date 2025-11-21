@@ -3,15 +3,20 @@
 export const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/api';
 
 export const SOURCES_OF_INCIDENT = [
-  'Customer Complaint',
-  'Internal Audit',
+  'Drawing & design issues',
+  'Wrong cutting list sent to production',
   'Management Review',
-  'Product Testing',
-  'Production Process',
-  'Supplier Issue',
-  'Employee Report',
-  'Equipment Failure',
-  'Quality Control',
+  'Wrong gluing',
+  'Wrong site dimension taken by site supervisor',
+  'Wrong item measurements taken by site supervisor',
+  'Wrong timber used',
+  'Assembly poorly done',
+  'Poor finish of item',
+  'Items missing with order',
+  'Wrong item purchased',
+  'Fittings missing ',
+  'Items broken during transportation',
+  'Commited delivery date and time not respected',
   'Other'
 ];
 
