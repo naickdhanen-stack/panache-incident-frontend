@@ -83,6 +83,7 @@ const UserDashboard = () => {
         subject: '',
         date_of_incident: '',
         project_name: '',
+        sales_work_order_number: '',
         source_of_incident: '',
         preliminary_investigation: false,
         details_and_findings: '',
@@ -189,6 +190,18 @@ const UserDashboard = () => {
                 </div>
 
                 <div className="form-group">
+                  <label>Sales Work Order Number</label>
+                  <input
+                    type="text"
+                    name="sales_work_order_number"
+                    value={formData.sales_work_order_number}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
                   <label>Source of Incident *</label>
                   <select
                     name="source_of_incident"
@@ -219,7 +232,7 @@ const UserDashboard = () => {
               </div>
 
               <div className="form-group">
-                <label>Details and Findings *</label>
+                <label>Details of Mistake Committed and Findings *</label>
                 <textarea
                   name="details_and_findings"
                   value={formData.details_and_findings}
@@ -292,13 +305,16 @@ const UserDashboard = () => {
                           <strong>Project:</strong> {incident.project_name || 'N/A'}
                         </div>
                         <div className="detail-row">
+                          <strong>Sales Work Order Number:</strong> {incident.sales_work_order_number || 'N/A'}
+                        </div>
+                        <div className="detail-row">
                           <strong>Source of Incident:</strong> {incident.source_of_incident}
                         </div>
                         <div className="detail-row">
                           <strong>Preliminary Investigation:</strong> {incident.preliminary_investigation ? 'Yes' : 'No'}
                         </div>
                         <div className="detail-row">
-                          <strong>Details and Findings:</strong>
+                          <strong>Details of Mistake Committed and Findings:</strong>
                           <p>{incident.details_and_findings}</p>
                         </div>
                         {incident.suggestions && (
