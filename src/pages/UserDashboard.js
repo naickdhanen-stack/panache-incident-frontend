@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { incidentsAPI } from '../utils/api';
-import { SOURCES_OF_INCIDENT, MISTAKES_COMMITTED} from '../utils/config';
+import { SOURCES_OF_INCIDENT } from '../utils/config';
 import './UserDashboard.css';
 
 const UserDashboard = () => {
@@ -16,8 +16,8 @@ const UserDashboard = () => {
     subject: '',
     date_of_incident: '',
     project_name: '',
+    sales_work_order_number: '',
     source_of_incident: '',
-    mistake_committed: '',
     preliminary_investigation: false,
     details_and_findings: '',
     suggestions: ''
@@ -84,7 +84,6 @@ const UserDashboard = () => {
         date_of_incident: '',
         project_name: '',
         source_of_incident: '',
-        mistake_committed: '',
         preliminary_investigation: false,
         details_and_findings: '',
         suggestions: ''
@@ -206,21 +205,6 @@ const UserDashboard = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label>Mistake Committed by Employee *</label>
-                  <select
-                    name="mistake_committed"
-                    value={formData.mistake_committed}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select mistake type</option>
-                    {MISTAKES_COMMITTED.map(mistake => (
-                      <option key={mistake} value={mistake}>{mistake}</option>
-                    ))}
-                  </select>
-                </div>
-
                 <div className="form-group checkbox-group">
                   <label>
                     <input
@@ -309,9 +293,6 @@ const UserDashboard = () => {
                         </div>
                         <div className="detail-row">
                           <strong>Source of Incident:</strong> {incident.source_of_incident}
-                        </div>
-                        <div className="detail-row">
-                          <strong>Mistake Committed:</strong> {incident.mistake_committed}
                         </div>
                         <div className="detail-row">
                           <strong>Preliminary Investigation:</strong> {incident.preliminary_investigation ? 'Yes' : 'No'}

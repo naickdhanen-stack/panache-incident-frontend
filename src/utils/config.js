@@ -15,19 +15,6 @@ export const SOURCES_OF_INCIDENT = [
   'Other'
 ];
 
-export const MISTAKES_COMMITTED = [
-  'Human Error',
-  'Equipment Malfunction',
-  'Process Deviation',
-  'Material Defect',
-  'Design Flaw',
-  'Training Gap',
-  'Communication Breakdown',
-  'Inadequate Procedure',
-  'Safety Violation',
-  'Other'
-];
-
 export const ROOT_CAUSES = [
   'Procedural',
   'Omission',

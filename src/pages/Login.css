@@ -117,3 +117,30 @@
   font-size: 0.85rem;
   margin: 0;
 }
+
+/* -------------------- 👁️ PASSWORD TOGGLE ADDITIONS -------------------- */
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* Space for eye icon */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+  color: #777;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #667eea;
+}

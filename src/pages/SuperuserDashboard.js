@@ -261,10 +261,10 @@ const SuperuserDashboard = () => {
                               <strong>Project Name:</strong> {incident.project_name || 'N/A'}
                             </div>
                             <div className="detail-row">
-                              <strong>Source of Incident:</strong> {incident.source_of_incident}
+                              <strong>Sales Work Order Number:</strong> {incident.sales_work_order_number || 'N/A'}
                             </div>
                             <div className="detail-row">
-                              <strong>Mistake Committed:</strong> {incident.mistake_committed}
+                              <strong>Source of Incident:</strong> {incident.source_of_incident}
                             </div>
                             <div className="detail-row">
                               <strong>Preliminary Investigation Done:</strong> {incident.preliminary_investigation ? 'Yes' : 'No'}
@@ -274,7 +274,7 @@ const SuperuserDashboard = () => {
                           <div className="detail-section">
                             <h4>Details</h4>
                             <div className="detail-row">
-                              <strong>Details and Findings:</strong>
+                              <strong>Details of Mistake Committed and Findings:</strong>
                               <p>{incident.details_and_findings}</p>
                             </div>
                             {incident.suggestions && (

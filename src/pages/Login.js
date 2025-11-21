@@ -6,6 +6,7 @@ import './Login.css';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 🔹 NEW
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -19,12 +20,11 @@ const Login = () => {
     const result = await login(username, password);
 
     if (result.success) {
-      // Redirect based on role will be handled by App.js
       navigate('/dashboard');
     } else {
       setError(result.error);
     }
-    
+
     setLoading(false);
   };
 
@@ -35,7 +35,7 @@ const Login = () => {
           <h1>PANACHE</h1>
           <p>Incident Report System</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="username">Username</label>
@@ -50,16 +50,24 @@ const Login = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group password-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'} // 🔹 Toggle based on state
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+              <span
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '🙈' : '👁️'} {/* You can replace icons later */}
+              </span>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
