@@ -324,6 +324,50 @@ const UserDashboard = () => {
                           </div>
                         )}
 
+                        {/* ✅ ATTACHMENTS SECTION — NEW */}
+                        {Array.isArray(incident.attachments) && incident.attachments.length > 0 && (
+                          <div className="attachments-section">
+                            <h4>Attachments</h4>
+                            <div className="attachments-grid">
+                              {incident.attachments.map((url, index) => {
+                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
+                                const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url);
+
+                                return (
+                                  <div key={index} className="attachment-item">
+                                    {isImage ? (
+                                      <img
+                                        src={url}
+                                        alt={`Attachment ${index + 1}`}
+                                        className="attachment-preview"
+                                        loading="lazy"
+                                        onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                                      />
+                                    ) : isVideo ? (
+                                      <video
+                                        src={url}
+                                        controls
+                                        className="attachment-preview"
+                                        loading="lazy"
+                                        onError={(e) => console.warn('Failed to load video:', url, e)}
+                                      />
+                                    ) : (
+                                      <a
+                                        href={url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="attachment-fallback"
+                                      >
+                                        📎 File {index + 1}
+                                      </a>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Show responses if any */}
                         {incident.incident_responses && incident.incident_responses.length > 0 && (
                           <div className="response-section">

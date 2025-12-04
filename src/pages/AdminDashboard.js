@@ -320,6 +320,50 @@ const AdminDashboard = () => {
                           </div>
                         </div>
 
+                        {/* ✅ ATTACHMENTS SECTION — NEW */}
+                        {Array.isArray(incident.attachments) && incident.attachments.length > 0 && (
+                          <div className="attachments-section">
+                            <h4>Attachments</h4>
+                            <div className="attachments-grid">
+                              {incident.attachments.map((url, index) => {
+                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
+                                const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url);
+
+                                return (
+                                  <div key={index} className="attachment-item">
+                                    {isImage ? (
+                                      <img
+                                        src={url}
+                                        alt={`Attachment ${index + 1}`}
+                                        className="attachment-preview"
+                                        loading="lazy"
+                                        onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                                      />
+                                    ) : isVideo ? (
+                                      <video
+                                        src={url}
+                                        controls
+                                        className="attachment-preview"
+                                        loading="lazy"
+                                        onError={(e) => console.warn('Failed to load video:', url, e)}
+                                      />
+                                    ) : (
+                                      <a
+                                        href={url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="attachment-fallback"
+                                      >
+                                        📎 File {index + 1}
+                                      </a>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Responses */}
                         {incident.incident_responses && incident.incident_responses.length > 0 && (
                           <div className="responses-section">
@@ -352,6 +396,37 @@ const AdminDashboard = () => {
                                 <div className="detail-row">
                                   <small>Acknowledged: {new Date(response.acknowledged_at).toLocaleString()}</small>
                                 </div>
+
+                                {/* ✅ HR Attachments (optional future extension) */}
+                                {Array.isArray(response.attachments) && response.attachments.length > 0 && (
+                                  <div className="attachments-section">
+                                    <h5>HR Evidence</h5>
+                                    <div className="attachments-grid">
+                                      {response.attachments.map((url, idx) => {
+                                        const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
+                                        const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url);
+                                        return (
+                                          <div key={`hr-${idx}`} className="attachment-item">
+                                            {isImage ? (
+                                              <img
+                                                src={url}
+                                                alt={`HR Attachment ${idx + 1}`}
+                                                className="attachment-preview"
+                                                onClick={() => window.open(url, '_blank')}
+                                              />
+                                            ) : isVideo ? (
+                                              <video src={url} controls className="attachment-preview" />
+                                            ) : (
+                                              <a href={url} target="_blank" rel="noopener noreferrer" className="attachment-fallback">
+                                                📎 HR File {idx + 1}
+                                              </a>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -659,6 +734,86 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Modal Overlay Styling (if not yet defined globally) */}
+      <style jsx>{`
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+        .modal-content {
+          background: white;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 600px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          border-bottom: 1px solid #eee;
+        }
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 2rem;
+          cursor: pointer;
+          color: #6c757d;
+        }
+        .acknowledge-form {
+          padding: 20px;
+        }
+        .status-buttons {
+          display: flex;
+          gap: 10px;
+          margin-top: 8px;
+        }
+        .status-btn {
+          flex: 1;
+          padding: 10px;
+          border: 2px solid #ced4da;
+          border-radius: 6px;
+          background: white;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+        .status-btn.active {
+          border-color: #e74c3c;
+          background: #fff5f5;
+          color: #c0392b;
+        }
+        .modal-actions {
+          display: flex;
+          gap: 15px;
+          margin-top: 20px;
+        }
+        .cancel-btn {
+          flex: 1;
+          padding: 12px;
+          background: #6c757d;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+        }
+        .cancel-btn:hover {
+          background: #5a6268;
+        }
+      `}</style>
     </div>
   );
 };

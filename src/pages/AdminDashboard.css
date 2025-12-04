@@ -73,18 +73,6 @@
   box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.section-header > div h2 {
-  margin: 0;
-  color: #333;
-}
-
 .users-container {
   background: white;
   border-radius: 12px;
@@ -265,6 +253,226 @@
   box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
 }
 
+/* ===== INCIDENTS REVIEW SECTION (e.g., Pending, In Progress, Closed) ===== */
+
+.incidents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.incident-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.incident-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.incident-header {
+  padding: 20px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.incident-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.incident-title h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-open {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-in-progress {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-closed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.incident-meta {
+  display: flex;
+  gap: 20px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.incident-details {
+  padding: 20px;
+  background-color: #fafafa;
+}
+
+.detail-row {
+  margin-bottom: 15px;
+}
+
+.detail-row strong {
+  display: block;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.detail-row p {
+  margin: 5px 0 0 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* ===== Attachments Section — Unified with User Dashboard ===== */
+.attachments-section {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eaeaea;
+}
+
+.attachments-section h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.attachments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.attachment-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.attachment-preview {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  background-color: #f8f9fa;
+  transition: all 0.25s ease;
+  border: 1px solid #e9ecef;
+}
+
+.attachment-preview:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  border-color: #e74c3c; /* 🔴 Red accent for admin context */
+}
+
+.attachment-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 110px;
+  padding: 0.5rem;
+  background: #f1f3f5;
+  border-radius: 8px;
+  color: #495057;
+  text-decoration: none;
+  font-size: 0.8rem;
+  text-align: center;
+  border: 1px dashed #ced4da;
+  transition: all 0.2s ease;
+}
+
+.attachment-fallback:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* HR Response Section */
+.response-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e74c3c; /* 🔴 Matches admin theme */
+}
+
+.response-section h4 {
+  color: #e74c3c;
+  margin: 0 0 15px 0;
+}
+
+.response-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #e74c3c; /* 🔴 Strong visual cue */
+}
+
+.response-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.respond-btn,
+.close-btn,
+.reopen-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.respond-btn {
+  background: #3498db;
+  color: white;
+}
+
+.respond-btn:hover {
+  background: #2980b9;
+}
+
+.close-btn {
+  background: #27ae60;
+  color: white;
+}
+
+.close-btn:hover {
+  background: #219653;
+}
+
+.reopen-btn {
+  background: #f39c12;
+  color: white;
+}
+
+.reopen-btn:hover {
+  background: #e67e22;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .tabs-container {
@@ -293,6 +501,21 @@
 
   .users-table-container {
     overflow-x: scroll;
+  }
+
+  .incident-meta {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* Attachments responsive */
+  .attachments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  .attachment-preview,
+  .attachment-fallback {
+    height: 90px;
   }
 
   .users-table {

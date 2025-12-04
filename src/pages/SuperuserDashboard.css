@@ -107,6 +107,74 @@
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
+/* ===== Attachments Section ===== */
+.attachments-section {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eaeaea;
+}
+
+.attachments-section h4,
+.attachments-section h5 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.attachments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.attachment-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.attachment-preview {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  background-color: #f8f9fa;
+  transition: all 0.25s ease;
+  border: 1px solid #e9ecef;
+}
+
+.attachment-preview:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  border-color: #667eea; /* 🔵 Blue accent for HR context */
+}
+
+.attachment-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 110px;
+  padding: 0.5rem;
+  background: #f1f3f5;
+  border-radius: 8px;
+  color: #495057;
+  text-decoration: none;
+  font-size: 0.8rem;
+  text-align: center;
+  border: 1px dashed #ced4da;
+  transition: all 0.2s ease;
+}
+
+.attachment-fallback:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -242,5 +310,15 @@
 
   .modal-actions button {
     width: 100%;
+  }
+
+  /* Attachments responsive */
+  .attachments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  .attachment-preview,
+  .attachment-fallback {
+    height: 90px;
   }
 }
