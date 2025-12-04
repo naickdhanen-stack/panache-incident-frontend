@@ -6,9 +6,7 @@ const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
@@ -17,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
+  // Load token + user on page refresh
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
@@ -24,9 +23,11 @@ export const AuthProvider = ({ children }) => {
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
-      // Set default axios header
+
+      // Set axios header
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
+
     setLoading(false);
   }, []);
 
@@ -37,21 +38,22 @@ export const AuthProvider = ({ children }) => {
         password
       });
 
-      const { token, user } = response.data;
+      const receivedToken = response.data.token;
+      const receivedUser = response.data.user;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      setToken(token);
-      setUser(user);
-      setLoading(false);
-      
-      // Token will be automatically added by axios interceptor in api.js
+      // Save in localStorage
+      localStorage.setItem('token', receivedToken);
+      localStorage.setItem('user', JSON.stringify(receivedUser));
+
+      // Save in state
+      setToken(receivedToken);
+      setUser(receivedUser);
+
+      // Set axios header (important!)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${receivedToken}`;
 
       return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
-      setLoading(false);
       return {
         success: false,
         error: error.response?.data?.error || 'Login failed'
@@ -67,20 +69,20 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
   };
 
-  const value = {
-    user,
-    token,
-    login,
-    logout,
-    loading,
-    isAuthenticated: !!token,
-    isAdmin: user?.role === 'admin',
-    isSuperuser: user?.role === 'superuser',
-    isUser: user?.role === 'user'
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        loading,
+        isAuthenticated: !!token,
+        isAdmin: user?.role === 'admin',
+        isSuperuser: user?.role === 'superuser',
+        isUser: user?.role === 'user',
+      }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );
