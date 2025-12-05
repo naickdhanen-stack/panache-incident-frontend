@@ -36,6 +36,7 @@ const UserDashboard = () => {
     setLoading(true);
     try {
       const response = await incidentsAPI.getAll();
+      console.log('API Response:', response.data); // Debugging
       setIncidents(response.data);
     } catch (error) {
       console.error('Error fetching incidents:', error);
@@ -324,17 +325,18 @@ const UserDashboard = () => {
                           </div>
                         )}
 
-                        {/* ✅ ATTACHMENTS SECTION — NEW */}
-                        {Array.isArray(incident.attachments) && incident.attachments.length > 0 && (
+                        {/* ATTACHMENTS SECTION - UPDATED */}
+                        {Array.isArray(incident.incident_attachments) && incident.incident_attachments.length > 0 && (
                           <div className="attachments-section">
                             <h4>Attachments</h4>
                             <div className="attachments-grid">
-                              {incident.attachments.map((url, index) => {
-                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
-                                const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url);
+                              {incident.incident_attachments.map((attachment, index) => {
+                                const url = attachment.signed_url || attachment.file_url;
+                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url) || attachment.file_type?.startsWith('video/');
+                                const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url) || attachment.file_type?.startsWith('image/');
 
                                 return (
-                                  <div key={index} className="attachment-item">
+                                  <div key={attachment.id || index} className="attachment-item">
                                     {isImage ? (
                                       <img
                                         src={url}
@@ -342,6 +344,7 @@ const UserDashboard = () => {
                                         className="attachment-preview"
                                         loading="lazy"
                                         onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                                        style={{ cursor: 'pointer' }}
                                       />
                                     ) : isVideo ? (
                                       <video
@@ -349,7 +352,6 @@ const UserDashboard = () => {
                                         controls
                                         className="attachment-preview"
                                         loading="lazy"
-                                        onError={(e) => console.warn('Failed to load video:', url, e)}
                                       />
                                     ) : (
                                       <a

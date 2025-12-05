@@ -6,23 +6,29 @@ import './Login.css';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // 🔹 NEW
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError('');
     setLoading(true);
 
-    const result = await login(username, password);
+    try {
+      const result = await login(username, password);
 
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error);
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.error || 'Invalid username or password');
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
     }
 
     setLoading(false);
@@ -54,7 +60,7 @@ const Login = () => {
             <label htmlFor="password">Password</label>
             <div className="password-wrapper">
               <input
-                type={showPassword ? 'text' : 'password'} // 🔹 Toggle based on state
+                type={showPassword ? 'text' : 'password'}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -65,7 +71,7 @@ const Login = () => {
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '🙈' : '👁️'} {/* You can replace icons later */}
+                {showPassword ? '🙈' : '👁️'}
               </span>
             </div>
           </div>

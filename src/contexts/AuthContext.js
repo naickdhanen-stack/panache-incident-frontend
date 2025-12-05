@@ -1,6 +1,8 @@
+// src/contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import { API_URL } from '../utils/config';
+// ✅ FIX 1: Import your configured axios instance (with baseURL + interceptors)
+import api from '../utils/api'; // ← NOT 'axios'
+import { API_URL } from '../utils/config'; // Optional: for debug only
 
 const AuthContext = createContext();
 
@@ -15,17 +17,20 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
-  // Load token + user on page refresh
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
 
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-
-      // Set axios header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setToken(storedToken);
+        setUser(parsedUser);
+        // ✅ No need to manually set header — api.js interceptor does it
+      } catch (e) {
+        console.error('Invalid user data in localStorage');
+        logout();
+      }
     }
 
     setLoading(false);
@@ -33,30 +38,32 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      // ✅ FIX 2: Use relative path '/login' — let api.js handle baseURL
+      // ✅ FIX 3: Use 'api', not 'axios'
+      const response = await api.post('/login', { // ← NOT '/auth/login'
         username,
         password
       });
 
-      const receivedToken = response.data.token;
-      const receivedUser = response.data.user;
+      const { token: receivedToken, user: receivedUser } = response.data;
 
-      // Save in localStorage
       localStorage.setItem('token', receivedToken);
       localStorage.setItem('user', JSON.stringify(receivedUser));
 
-      // Save in state
       setToken(receivedToken);
       setUser(receivedUser);
 
-      // Set axios header (important!)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${receivedToken}`;
-
       return { success: true };
     } catch (error) {
+      console.error('Login error details:', {
+        status: error.response?.status,
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        data: error.response?.data
+      });
       return {
         success: false,
-        error: error.response?.data?.error || 'Login failed'
+        error: error.response?.data?.error || 'Invalid username or password'
       };
     }
   };
@@ -66,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
-    delete axios.defaults.headers.common['Authorization'];
+    // ✅ Interceptor auto-removes header on next request — no need to delete manually
   };
 
   return (
