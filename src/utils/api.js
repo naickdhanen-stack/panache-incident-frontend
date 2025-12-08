@@ -125,23 +125,23 @@ export const validateFiles = (files) => {
 };
 
 // ======================
-// API SERVICES
+// API SERVICES - FIXED WITH /api PREFIX
 // ======================
 
 // 🔐 Users API
 export const usersAPI = {
-  getAll: () => api.get('/users'),
-  getById: (id) => api.get(`/users/${id}`),
-  create: (userData) => api.post('/users', userData),
-  update: (id, userData) => api.put(`/users/${id}`, userData),
-  archive: (id) => api.patch(`/users/${id}/archive`),
-  delete: (id) => api.delete(`/users/${id}`)
+  getAll: () => api.get('/api/users'),
+  getById: (id) => api.get(`/api/users/${id}`),
+  create: (userData) => api.post('/api/users', userData),
+  update: (id, userData) => api.put(`/api/users/${id}`, userData),
+  archive: (id) => api.patch(`/api/users/${id}/archive`),
+  delete: (id) => api.delete(`/api/users/${id}`)
 };
 
 // 📝 Incidents API
 export const incidentsAPI = {
-  getAll: () => api.get('/incidents'),
-  getById: (id) => api.get(`/incidents/${id}`),
+  getAll: () => api.get('/api/incidents'),
+  getById: (id) => api.get(`/api/incidents/${id}`),
 
   create: (formData) => {
     const attachments = formData.getAll('attachments').filter(f => f instanceof File);
@@ -150,12 +150,12 @@ export const incidentsAPI = {
       return Promise.reject(new Error(validation.error));
     }
 
-    return api.post('/incidents', formData);
+    return api.post('/api/incidents', formData);
   },
 
-  acknowledge: (id, data) => api.post(`/incidents/${id}/acknowledge`, data),
-  updateStatus: (id, status) => api.patch(`/incidents/${id}/status`, { status }),
-  delete: (id) => api.delete(`/incidents/${id}`),
+  acknowledge: (id, data) => api.post(`/api/incidents/${id}/acknowledge`, data),
+  updateStatus: (id, status) => api.patch(`/api/incidents/${id}/status`, { status }),
+  delete: (id) => api.delete(`/api/incidents/${id}`),
 
   validateFiles
 };
