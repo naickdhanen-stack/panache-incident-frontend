@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 // ✅ Import your configured axios instance (with baseURL + interceptors)
-import api from '../api'; // ← Updated path to match your structure
-import { API_URL } from '../config'; // Optional: for debug only
+import api from '../utils/api';
+import { API_URL } from '../utils/config';
 
 const AuthContext = createContext();
 
