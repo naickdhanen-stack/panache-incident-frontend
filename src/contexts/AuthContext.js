@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // ✅ FIX 2: Use relative path '/login' — let api.js handle baseURL
       // ✅ FIX 3: Use 'api', not 'axios'
-      const response = await api.post('/api/login', { // ← NOT '/auth/login'
+      const response = await api.post('/login', { // ← NOT '/auth/login'
         username,
         password
       });
