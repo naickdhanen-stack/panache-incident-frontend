@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 import { API_URL } from './config';
 
@@ -142,7 +143,12 @@ export const incidentsAPI = {
       return Promise.reject(new Error(validation.error));
     }
 
-    return api.post('/api/incidents', formData);
+    // IMPORTANT: Override Content-Type for multipart/form-data
+    return api.post('/api/incidents', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
 
   acknowledge: (id, data) => api.post(`/api/incidents/${id}/acknowledge`, data),
