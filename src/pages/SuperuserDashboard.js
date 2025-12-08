@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { incidentsAPI, usersAPI } from '../utils/api';
 import { ROOT_CAUSES } from '../utils/config';
+import { exportIncidentsToExcel, exportIncidentsBySalesOrder } from '../utils/excelExport';
 import './SuperuserDashboard.css';
 
 const SuperuserDashboard = () => {
@@ -11,6 +12,11 @@ const SuperuserDashboard = () => {
   const [expandedIncident, setExpandedIncident] = useState(null);
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [acknowledgingIncident, setAcknowledgingIncident] = useState(null);
+  
+  // Selection & Export states
+  const [selectedIncidents, setSelectedIncidents] = useState(new Set());
+  const [salesOrderFilter, setSalesOrderFilter] = useState('');
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Create user form state
   const [newUser, setNewUser] = useState({
@@ -47,6 +53,52 @@ const SuperuserDashboard = () => {
 
   const toggleIncidentDetails = (incidentId) => {
     setExpandedIncident(expandedIncident === incidentId ? null : incidentId);
+  };
+
+  // Selection handlers
+  const handleSelectIncident = (incidentId) => {
+    const newSelected = new Set(selectedIncidents);
+    if (newSelected.has(incidentId)) {
+      newSelected.delete(incidentId);
+    } else {
+      newSelected.add(incidentId);
+    }
+    setSelectedIncidents(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIncidents.size === incidents.length) {
+      setSelectedIncidents(new Set());
+    } else {
+      setSelectedIncidents(new Set(incidents.map(i => i.id)));
+    }
+  };
+
+  // Export handlers
+  const handleExportSelected = () => {
+    const selected = incidents.filter(i => selectedIncidents.has(i.id));
+    if (selected.length === 0) {
+      alert('Please select at least one incident to export');
+      return;
+    }
+    exportIncidentsToExcel(selected);
+    setShowExportMenu(false);
+  };
+
+  const handleExportAll = () => {
+    exportIncidentsToExcel(incidents);
+    setShowExportMenu(false);
+  };
+
+  const handleExportBySalesOrder = () => {
+    const order = salesOrderFilter.trim();
+    if (!order) {
+      alert('Please enter a Sales Work Order Number');
+      return;
+    }
+    exportIncidentsBySalesOrder(incidents, order);
+    setSalesOrderFilter('');
+    setShowExportMenu(false);
   };
 
   const handleCreateUser = async (e) => {
@@ -125,6 +177,13 @@ const SuperuserDashboard = () => {
       default: return '';
     }
   };
+
+  // Get unique sales order numbers
+  const uniqueSalesOrders = [...new Set(
+    incidents
+      .map(i => i.sales_work_order_number)
+      .filter(Boolean)
+  )].sort();
 
   return (
     <div className="dashboard-container">
@@ -215,7 +274,99 @@ const SuperuserDashboard = () => {
         ) : (
           /* Incidents List */
           <div className="incidents-container">
-            <h2>All Incident Reports</h2>
+            <div className="section-header">
+              <h2>All Incident Reports</h2>
+              <div className="header-actions">
+                <span className="selection-count">
+                  {selectedIncidents.size > 0 && `${selectedIncidents.size} selected`}
+                </span>
+                <button 
+                  className="export-btn"
+                  onClick={() => setShowExportMenu(!showExportMenu)}
+                >
+                  📊 Export to Excel
+                </button>
+              </div>
+            </div>
+
+            {/* Export Menu */}
+            {showExportMenu && (
+              <div className="export-menu">
+                <h3>Export Options</h3>
+                
+                <div className="export-option">
+                  <button 
+                    className="export-option-btn"
+                    onClick={handleExportAll}
+                  >
+                    📥 Export All Incidents ({incidents.length})
+                  </button>
+                </div>
+
+                <div className="export-option">
+                  <button 
+                    className="export-option-btn"
+                    onClick={handleExportSelected}
+                    disabled={selectedIncidents.size === 0}
+                  >
+                    ✅ Export Selected ({selectedIncidents.size})
+                  </button>
+                </div>
+
+                <div className="export-option">
+                  <label>Filter by Sales Work Order:</label>
+                  <div className="filter-group">
+                    <input
+                      type="text"
+                      placeholder="Enter Sales Work Order Number"
+                      value={salesOrderFilter}
+                      onChange={(e) => setSalesOrderFilter(e.target.value)}
+                      list="sales-orders"
+                    />
+                    <datalist id="sales-orders">
+                      {uniqueSalesOrders.map(order => (
+                        <option key={order} value={order} />
+                      ))}
+                    </datalist>
+                    <button 
+                      className="filter-export-btn"
+                      onClick={handleExportBySalesOrder}
+                    >
+                      Export
+                    </button>
+                  </div>
+                </div>
+
+                <button 
+                  className="close-menu-btn"
+                  onClick={() => setShowExportMenu(false)}
+                >
+                  Close
+                </button>
+              </div>
+            )}
+
+            {/* Selection Controls */}
+            {!loading && incidents.length > 0 && (
+              <div className="selection-controls">
+                <label className="select-all-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedIncidents.size === incidents.length && incidents.length > 0}
+                    onChange={handleSelectAll}
+                  />
+                  Select All
+                </label>
+                {selectedIncidents.size > 0 && (
+                  <button 
+                    className="clear-selection-btn"
+                    onClick={() => setSelectedIncidents(new Set())}
+                  >
+                    Clear Selection
+                  </button>
+                )}
+              </div>
+            )}
 
             {loading ? (
               <p className="loading">Loading incidents...</p>
@@ -224,7 +375,16 @@ const SuperuserDashboard = () => {
             ) : (
               <div className="incidents-list">
                 {incidents.map(incident => (
-                  <div key={incident.id} className="incident-card">
+                  <div key={incident.id} className={`incident-card ${selectedIncidents.has(incident.id) ? 'selected' : ''}`}>
+                    <div className="incident-selection">
+                      <input
+                        type="checkbox"
+                        checked={selectedIncidents.has(incident.id)}
+                        onChange={() => handleSelectIncident(incident.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                    
                     <div className="incident-header" onClick={() => toggleIncidentDetails(incident.id)}>
                       <div className="incident-title">
                         <div>
@@ -286,17 +446,18 @@ const SuperuserDashboard = () => {
                           </div>
                         </div>
 
-                        {/* ✅ ATTACHMENTS SECTION — NEW */}
-                        {Array.isArray(incident.attachments) && incident.attachments.length > 0 && (
+                        {/* Attachments */}
+                        {Array.isArray(incident.incident_attachments) && incident.incident_attachments.length > 0 && (
                           <div className="attachments-section">
                             <h4>Attachments</h4>
                             <div className="attachments-grid">
-                              {incident.attachments.map((url, index) => {
-                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
-                                const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url);
+                              {incident.incident_attachments.map((attachment, index) => {
+                                const url = attachment.signed_url || attachment.file_url;
+                                const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url) || attachment.file_type?.startsWith('video/');
+                                const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url) || attachment.file_type?.startsWith('image/');
 
                                 return (
-                                  <div key={index} className="attachment-item">
+                                  <div key={attachment.id || index} className="attachment-item">
                                     {isImage ? (
                                       <img
                                         src={url}
@@ -311,7 +472,6 @@ const SuperuserDashboard = () => {
                                         controls
                                         className="attachment-preview"
                                         loading="lazy"
-                                        onError={(e) => console.warn('Failed to load video:', url, e)}
                                       />
                                     ) : (
                                       <a
@@ -330,7 +490,7 @@ const SuperuserDashboard = () => {
                           </div>
                         )}
 
-                        {/* Show existing responses */}
+                        {/* Responses */}
                         {incident.incident_responses && incident.incident_responses.length > 0 && (
                           <div className="responses-section">
                             <h4>Acknowledgment History</h4>
@@ -362,37 +522,6 @@ const SuperuserDashboard = () => {
                                 <div className="detail-row">
                                   <small>Acknowledged: {new Date(response.acknowledged_at).toLocaleString()}</small>
                                 </div>
-
-                                {/* ✅ HR Attachments (optional future extension) */}
-                                {Array.isArray(response.attachments) && response.attachments.length > 0 && (
-                                  <div className="attachments-section">
-                                    <h5>HR Evidence</h5>
-                                    <div className="attachments-grid">
-                                      {response.attachments.map((url, idx) => {
-                                        const isVideo = /\.(mp4|mov|avi|webm)$/i.test(url);
-                                        const isImage = /\.(jpe?g|png|gif|webp|bmp)$/i.test(url);
-                                        return (
-                                          <div key={`hr-${idx}`} className="attachment-item">
-                                            {isImage ? (
-                                              <img
-                                                src={url}
-                                                alt={`HR Attachment ${idx + 1}`}
-                                                className="attachment-preview"
-                                                onClick={() => window.open(url, '_blank')}
-                                              />
-                                            ) : isVideo ? (
-                                              <video src={url} controls className="attachment-preview" />
-                                            ) : (
-                                              <a href={url} target="_blank" rel="noopener noreferrer" className="attachment-fallback">
-                                                📎 HR File {idx + 1}
-                                              </a>
-                                            )}
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                             ))}
                           </div>
@@ -419,7 +548,7 @@ const SuperuserDashboard = () => {
         )}
       </div>
 
-      {/* Acknowledge Modal */}
+      {/* Acknowledge Modal - Keep existing code */}
       {acknowledgingIncident && (
         <div className="modal-overlay" onClick={closeAcknowledgeForm}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -517,153 +646,165 @@ const SuperuserDashboard = () => {
         </div>
       )}
 
-      {/* Inline Modal Styling (if not in CSS) */}
+      {/* Add CSS for new features */}
       <style jsx>{`
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-        }
-        .modal-content {
-          background: white;
-          border-radius: 12px;
-          width: 90%;
-          max-width: 600px;
-          max-height: 90vh;
-          overflow-y: auto;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        .modal-header {
+        .section-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 20px;
-          border-bottom: 1px solid #eee;
+          margin-bottom: 20px;
         }
-        .close-btn {
-          background: none;
-          border: none;
-          font-size: 2rem;
-          cursor: pointer;
-          color: #6c757d;
-        }
-        .acknowledge-form {
-          padding: 20px;
-        }
-        .status-buttons {
-          display: flex;
-          gap: 10px;
-          margin-top: 8px;
-        }
-        .status-btn {
-          flex: 1;
-          padding: 10px;
-          border: 2px solid #ced4da;
-          border-radius: 6px;
-          background: white;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.2s;
-        }
-        .status-btn.active {
-          border-color: #3498db;
-          background: #e3f2fd;
-          color: #2980b9;
-        }
-        .modal-actions {
+        .header-actions {
           display: flex;
           gap: 15px;
-          margin-top: 20px;
+          align-items: center;
         }
-        .cancel-btn {
-          flex: 1;
-          padding: 12px;
-          background: #6c757d;
+        .selection-count {
+          font-weight: 600;
+          color: #3498db;
+        }
+        .export-btn {
+          padding: 10px 20px;
+          background: #27ae60;
           color: white;
           border: none;
           border-radius: 8px;
           cursor: pointer;
           font-weight: 600;
+          transition: background 0.2s;
         }
-        .cancel-btn:hover {
-          background: #5a6268;
+        .export-btn:hover {
+          background: #229954;
         }
-
-        /* Ensure attachment styles exist if not in CSS */
-        .attachments-section {
-          margin-top: 1.2rem;
-          padding-top: 1rem;
-          border-top: 1px solid #eaeaea;
+        .export-menu {
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 20px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .attachments-section h4, .attachments-section h5 {
-          margin: 0 0 0.75rem;
-          font-size: 1.1rem;
+        .export-menu h3 {
+          margin: 0 0 15px 0;
           color: #2c3e50;
+        }
+        .export-option {
+          margin-bottom: 15px;
+        }
+        .export-option label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #34495e;
+        }
+        .export-option-btn {
+          width: 100%;
+          padding: 12px;
+          background: #3498db;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: background 0.2s;
+        }
+        .export-option-btn:hover:not(:disabled) {
+          background: #2980b9;
+        }
+        .export-option-btn:disabled {
+          background: #95a5a6;
+          cursor: not-allowed;
+        }
+        .filter-group {
+          display: flex;
+          gap: 10px;
+        }
+        .filter-group input {
+          flex: 1;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+        }
+        .filter-export-btn {
+          padding: 10px 20px;
+          background: #e67e22;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
           font-weight: 600;
         }
-        .attachments-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-          gap: 12px;
+        .filter-export-btn:hover {
+          background: #d35400;
         }
-        .attachment-item {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .attachment-preview {
+        .close-menu-btn {
           width: 100%;
-          height: 110px;
-          object-fit: cover;
+          padding: 10px;
+          background: #95a5a6;
+          color: white;
+          border: none;
           border-radius: 8px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
           cursor: pointer;
-          background-color: #f8f9fa;
-          transition: all 0.25s ease;
-          border: 1px solid #e9ecef;
+          margin-top: 10px;
         }
-        .attachment-preview:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-          border-color: #3498db;
+        .close-menu-btn:hover {
+          background: #7f8c8d;
         }
-        .attachment-fallback {
+        .selection-controls {
           display: flex;
-          flex-direction: column;
+          gap: 15px;
           align-items: center;
-          justify-content: center;
-          width: 100%;
-          height: 110px;
-          padding: 0.5rem;
-          background: #f1f3f5;
+          margin-bottom: 15px;
+          padding: 10px;
+          background: #f8f9fa;
           border-radius: 8px;
-          color: #495057;
-          text-decoration: none;
-          font-size: 0.8rem;
-          text-align: center;
-          border: 1px dashed #ced4da;
-          transition: all 0.2s ease;
         }
-        .attachment-fallback:hover {
-          background: #e9ecef;
-          border-color: #adb5bd;
+        .select-all-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 600;
+          cursor: pointer;
         }
-
-        @media (max-width: 768px) {
-          .attachments-grid {
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-          }
-          .attachment-preview,
-          .attachment-fallback {
-            height: 90px;
-          }
+        .select-all-label input {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+        }
+        .clear-selection-btn {
+          padding: 6px 12px;
+          background: #e74c3c;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.9rem;
+        }
+        .clear-selection-btn:hover {
+          background: #c0392b;
+        }
+        .incident-card {
+          position: relative;
+          border: 2px solid transparent;
+          transition: border-color 0.2s;
+        }
+        .incident-card.selected {
+          border-color: #3498db;
+          background: #f0f8ff;
+        }
+        .incident-selection {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          z-index: 10;
+        }
+        .incident-selection input {
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+        }
+        .incident-header {
+          padding-left: 50px;
         }
       `}</style>
     </div>
