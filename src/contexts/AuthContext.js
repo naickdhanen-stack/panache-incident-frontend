@@ -47,8 +47,10 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('🔐 Attempting login...');
       console.log('API URL:', API_URL);
+      console.log('Full URL will be:', `${API_URL}/api/login`);
       
-      const response = await api.post('/api/auth/login', {
+      // ✅ FIXED: Changed from /api/auth/login to /api/login
+      const response = await api.post('/api/login', {
         username,
         password
       });
