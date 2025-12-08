@@ -67,10 +67,9 @@ api.interceptors.response.use(
 );
 
 // ======================
-// FILE VALIDATION UTILITIES
+// FILE VALIDATION UTILITIES - NO SIZE LIMIT
 // ======================
 export const FILE_CONFIG = {
-  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10 MB
   MAX_FILES: 5,
   ALLOWED_MIME_TYPES: [
     // Images
@@ -101,14 +100,7 @@ export const validateFiles = (files) => {
   }
 
   for (const file of files) {
-    if (file.size > FILE_CONFIG.MAX_FILE_SIZE) {
-      return {
-        valid: false,
-        error: `File "${file.name}" exceeds ${FILE_CONFIG.MAX_FILE_SIZE / (1024 * 1024)}MB limit`,
-        file
-      };
-    }
-
+    // Only validate file type, no size limit
     if (!FILE_CONFIG.ALLOWED_MIME_TYPES.includes(file.type)) {
       const ext = file.name.split('.').pop().toLowerCase();
       if (!FILE_CONFIG.ALLOWED_EXTENSIONS.includes(ext)) {
@@ -125,7 +117,7 @@ export const validateFiles = (files) => {
 };
 
 // ======================
-// API SERVICES - FIXED WITH /api PREFIX
+// API SERVICES
 // ======================
 
 // 🔐 Users API
