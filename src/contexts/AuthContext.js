@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
-// ✅ FIX 1: Import your configured axios instance (with baseURL + interceptors)
-import api from '../utils/api'; // ← NOT 'axios'
-import { API_URL } from '../utils/config'; // Optional: for debug only
+// ✅ Import your configured axios instance (with baseURL + interceptors)
+import api from '../api'; // ← Updated path to match your structure
+import { API_URL } from '../config'; // Optional: for debug only
 
 const AuthContext = createContext();
 
@@ -38,9 +38,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      // ✅ FIX 2: Use relative path '/login' — let api.js handle baseURL
-      // ✅ FIX 3: Use 'api', not 'axios'
-      const response = await api.post('/login', { // ← NOT '/auth/login'
+      // ✅ FIXED: Use '/api/auth/login' to match backend route
+      const response = await api.post('/api/auth/login', {
         username,
         password
       });
