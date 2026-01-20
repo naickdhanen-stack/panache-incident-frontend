@@ -17,7 +17,6 @@ const UserDashboard = () => {
     date_of_incident: '',
     project_name: '',
     sales_work_order_number: '',
-    submitted_on_behalf_of: '',
     source_of_incident: '',
     preliminary_investigation: false,
     details_and_findings: '',
@@ -86,7 +85,6 @@ const UserDashboard = () => {
         date_of_incident: '',
         project_name: '',
         sales_work_order_number: '',
-        submitted_on_behalf_of: '',
         source_of_incident: '',
         preliminary_investigation: false,
         details_and_findings: '',
@@ -193,7 +191,7 @@ const UserDashboard = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Sales/Work Order Number</label>
+                  <label>Sales Work Order Number</label>
                   <input
                     type="text"
                     name="sales_work_order_number"
@@ -202,18 +200,6 @@ const UserDashboard = () => {
                   />
                 </div>
               </div>
-
-              <div className="form-row">
-              <div className="form-group">
-                <label>Submitted on behalf of:</label>
-                <input
-                 type="text"
-                 name="submitted_on_behalf_of"
-                 value={formData.submitted_on_behalf_of}
-                 onChange={handleInputChange}
-                 />
-                 </div>
-                 </div>
 
               <div className="form-row">
                 <div className="form-group">
@@ -320,10 +306,7 @@ const UserDashboard = () => {
                           <strong>Project:</strong> {incident.project_name || 'N/A'}
                         </div>
                         <div className="detail-row">
-                          <strong>Sales/Work Order Number:</strong> {incident.sales_work_order_number || 'N/A'}
-                        </div>
-                        <div className="detail-row">
-                          <strong>Submitted on behalf of:</strong> {incident.submitted_on_behalf_of || "N/A"}
+                          <strong>Sales Work Order Number:</strong> {incident.sales_work_order_number || 'N/A'}
                         </div>
                         <div className="detail-row">
                           <strong>Source of Incident:</strong> {incident.source_of_incident}

@@ -295,7 +295,11 @@ const AdminDashboard = () => {
                               <strong>Project Name:</strong> {incident.project_name || 'N/A'}
                             </div>
                             <div className="detail-row">
-                              <strong>Sales Work Order Number:</strong> {incident.sales_work_order_number || 'N/A'}
+                              <strong>Sales/Work Order Number:</strong> {incident.sales_work_order_number || 'N/A'}
+                            </div>
+
+                            <div className="detail-row">
+                              <strong>Submitted on behalf of:</strong> {incident.submitted_on_behalf_of || 'N/A'}
                             </div>
                             <div className="detail-row">
                               <strong>Source of Incident:</strong> {incident.source_of_incident}
